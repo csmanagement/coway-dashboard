@@ -225,7 +225,6 @@
 
   <script>
     // ── CONFIG ──────────────────────────────────────────
-    const REFRESH_MINUTE  = 10;   // refresh setiap 60 menit
     const DASHBOARD_WIDTH   = 1220; // canvas width Looker Studio
     const DASHBOARD_HEIGHT  = 775;  // canvas height Looker Studio
     // ────────────────────────────────────────────────────
@@ -271,18 +270,22 @@
       const now = new Date();
       const next = new Date(now);
 
-      next.setMinutes(10, 0, 0); // menit ke-10
-
-      // kalau menit ke-10 jam ini udah lewat, maju ke jam berikutnya
-      if (next <= now) {
+      // Tentukan menit target: 15 atau 45
+      const minutes = now.getMinutes();
+      if (minutes < 15) {
+        next.setMinutes(15, 0, 0);
+      } else if (minutes < 45) {
+        next.setMinutes(45, 0, 0);
+      } else {
         next.setHours(next.getHours() + 1);
+        next.setMinutes(15, 0, 0);
       }
 
       return next;
     }
 
     let nextRefreshTime = getNextRefreshTime();
-    let prevRefreshTime = new Date(nextRefreshTime.getTime() - 60 * 60 * 1000); // 1 jam sebelumnya
+    let prevRefreshTime = new Date(nextRefreshTime.getTime() - 30 * 60 * 1000); // 30 menit sebelumnya
 
     function doRefresh() {
       flashEl.classList.add('show');
