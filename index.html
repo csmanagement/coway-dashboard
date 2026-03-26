@@ -270,15 +270,15 @@
       const now = new Date();
       const next = new Date(now);
 
-      // Tentukan menit target: 15 atau 45
+      // Tentukan menit target: 10 atau 40
       const minutes = now.getMinutes();
-      if (minutes < 15) {
-        next.setMinutes(15, 0, 0);
-      } else if (minutes < 45) {
-        next.setMinutes(45, 0, 0);
+      if (minutes < 10) {
+        next.setMinutes(10, 0, 0);
+      } else if (minutes < 40) {
+        next.setMinutes(40, 0, 0);
       } else {
         next.setHours(next.getHours() + 1);
-        next.setMinutes(15, 0, 0);
+        next.setMinutes(10, 0, 0);
       }
 
       return next;
