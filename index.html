@@ -14,7 +14,6 @@
       --bar-h: 28px;
     }
 
-    /* Use 100dvh so it fills the true viewport on TVs / fullscreen browsers */
     html, body {
       width: 100%;
       height: 100dvh;
@@ -40,8 +39,10 @@
       justify-content: space-between;
       padding: 0 16px;
       gap: 12px;
-      /* prevent topbar from ever wrapping / overflowing */
-      overflow: hidden;
+      /* changed from hidden → visible so dropdown menu doesn't get clipped */
+      overflow: visible;
+      position: relative;
+      z-index: 20;
     }
 
     .topbar-left {
@@ -79,7 +80,7 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      overflow: hidden;
+      overflow: visible;  /* allow dropdown to show */
     }
 
     .info-block {
@@ -119,7 +120,6 @@
       flex-shrink: 0;
     }
 
-    /* Hide less-critical blocks on narrow screens */
     @media (max-width: 600px) {
       .hide-sm { display: none !important; }
     }
@@ -127,19 +127,132 @@
       .hide-xs { display: none !important; }
     }
 
+    /* ── DOWNLOAD BUTTON + DROPDOWN ── */
+    .download-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .download-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 20px;
+      padding: 0 10px;
+      background: rgba(125, 184, 240, 0.08);
+      border: 1px solid #1e2d40;
+      border-radius: 4px;
+      color: #7db8f0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .download-btn:hover {
+      background: rgba(125, 184, 240, 0.18);
+      border-color: #2a4a6a;
+    }
+
+    .download-btn.open {
+      background: rgba(125, 184, 240, 0.22);
+      border-color: #2a4a6a;
+    }
+
+    .download-btn svg {
+      width: 11px;
+      height: 11px;
+      flex-shrink: 0;
+    }
+
+    .chevron {
+      width: 8px;
+      height: 8px;
+      opacity: 0.7;
+      transition: transform 0.15s ease;
+    }
+
+    .download-btn.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      min-width: 200px;
+      background: #111827;
+      border: 1px solid #1e2d40;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-4px);
+      transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+      z-index: 100;
+      overflow: hidden;
+    }
+
+    .dropdown.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-header {
+      padding: 8px 12px 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5px;
+      color: #4b6484;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid #1e2d40;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      font-family: 'Sora', sans-serif;
+      font-size: 11px;
+      color: #b0c4dc;
+      cursor: pointer;
+      transition: background 0.1s ease, color 0.1s ease;
+      border-bottom: 1px solid #1a2535;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(125, 184, 240, 0.1);
+      color: #e0eaf5;
+    }
+
+    .dropdown-item svg {
+      width: 12px;
+      height: 12px;
+      color: #7db8f0;
+      flex-shrink: 0;
+    }
+
+    .dropdown-item-label {
+      flex: 1;
+    }
+
     /* ── IFRAME WRAPPER ── */
-    /*
-     * flex: 1 means it takes all remaining height after the topbar.
-     * We also set an explicit height fallback using calc() for browsers
-     * that don't honor flex height properly in fullscreen mode.
-     */
     .iframe-wrap {
       flex: 1 1 0;
-      min-height: 0;           /* critical: lets flex children shrink below content size */
+      min-height: 0;
       position: relative;
       overflow: hidden;
       background: var(--dark);
-      /* Explicit fallback height for environments that struggle with flex + dvh */
       height: calc(100dvh - var(--bar-h));
     }
 
@@ -149,9 +262,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      /* width/height/transform set entirely by JS */
       transform-origin: top left;
-      /* GPU-accelerated compositing layer — smoother rescales */
       will-change: transform;
     }
 
@@ -187,6 +298,33 @@
     .flash.show .flash-text {
       opacity: 1;
     }
+
+    /* ── TOAST (feedback saat download) ── */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #111827;
+      border: 1px solid #1e2d40;
+      border-left: 3px solid #22c55e;
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #b0c4dc;
+      letter-spacing: 0.05em;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+      z-index: 200;
+      max-width: 280px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body>
@@ -216,6 +354,53 @@
         <span class="info-label">Refresh In</span>
         <span class="countdown" id="countdown">—</span>
       </div>
+
+      <div class="divider"></div>
+
+      <!-- ── DOWNLOAD BUTTON ── -->
+      <div class="download-wrap" id="download-wrap">
+        <button class="download-btn" id="download-btn" type="button" aria-haspopup="true" aria-expanded="false">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 2v9"/>
+            <path d="M4 7l4 4 4-4"/>
+            <path d="M2 13h12"/>
+          </svg>
+          <span>Save Image</span>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </button>
+
+        <div class="dropdown" id="dropdown" role="menu">
+          <div class="dropdown-header">Choose Dashboard Page</div>
+
+          <div class="dropdown-item" data-file-id="1swG4_2QMroSOPH-AqqM6ARfmCIa3lZXK" data-filename="installation_task_latest.png" role="menuitem" tabindex="0">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="12" height="10" rx="1"/>
+              <path d="M2 7h12"/>
+              <path d="M6 3v10"/>
+            </svg>
+            <span class="dropdown-item-label">Installation Task</span>
+          </div>
+
+          <div class="dropdown-item" data-file-id="1Bk8SbxZcCLqocoom4qWuy05w2i3sveVq" data-filename="sales_order_latest.png" role="menuitem" tabindex="0">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 4h10l-1 8H4L3 4z"/>
+              <path d="M6 4V2h4v2"/>
+            </svg>
+            <span class="dropdown-item-label">Sales Order</span>
+          </div>
+
+          <div class="dropdown-item" data-file-id="1KmSDhxLuPgUqpRCDkhKhRqniipgxrJhr" data-filename="comparison_status_latest.png" role="menuitem" tabindex="0">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 13V7"/>
+              <path d="M8 13V3"/>
+              <path d="M13 13V9"/>
+            </svg>
+            <span class="dropdown-item-label">Comparison Status</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -233,10 +418,13 @@
     ></iframe>
   </div>
 
+  <!-- Toast untuk feedback download -->
+  <div class="toast" id="toast">Downloading…</div>
+
   <script>
     // ── CONFIG ──────────────────────────────────────────
-    const DASHBOARD_WIDTH  = 1220; // Looker Studio canvas width  (px)
-    const DASHBOARD_HEIGHT = 775;  // Looker Studio canvas height (px)
+    const DASHBOARD_WIDTH  = 1220;
+    const DASHBOARD_HEIGHT = 775;
     const DASHBOARD_RATIO  = DASHBOARD_WIDTH / DASHBOARD_HEIGHT;
     // ────────────────────────────────────────────────────
 
@@ -247,31 +435,26 @@
     const nextEl      = document.getElementById('next-refresh');
     const countdownEl = document.getElementById('countdown');
 
-    // ── DYNAMIC SCALE ────────────────────────────────────
-    // Uses getBoundingClientRect for the most reliable pixel dimensions,
-    // especially in fullscreen / TV kiosk mode.
+    // ── DYNAMIC SCALE (unchanged) ────────────────────────
     function scaleIframe() {
       const rect  = wrapEl.getBoundingClientRect();
       const wrapW = rect.width;
       const wrapH = rect.height;
 
-      if (wrapW === 0 || wrapH === 0) return; // guard during hidden/init states
+      if (wrapW === 0 || wrapH === 0) return;
 
       const wrapRatio = wrapW / wrapH;
 
       let scale;
       if (wrapRatio > DASHBOARD_RATIO) {
-        // Wrapper is wider than the dashboard aspect → constrain by height
         scale = wrapH / DASHBOARD_HEIGHT;
       } else {
-        // Wrapper is taller than the dashboard aspect → constrain by width
         scale = wrapW / DASHBOARD_WIDTH;
       }
 
       const scaledW = DASHBOARD_WIDTH  * scale;
       const scaledH = DASHBOARD_HEIGHT * scale;
 
-      // Center horizontally and vertically inside the wrapper
       const offsetX = (wrapW - scaledW) / 2;
       const offsetY = (wrapH - scaledH) / 2;
 
@@ -281,18 +464,104 @@
         `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
     }
 
-    // ResizeObserver fires whenever the wrapper itself changes size
-    // (window resize, orientation change, browser chrome show/hide, fullscreen toggle)
     const ro = new ResizeObserver(() => scaleIframe());
     ro.observe(wrapEl);
-
-    // Fallback for browsers without ResizeObserver support
     window.addEventListener('resize', scaleIframe);
-
-    // Initial scale — defer one frame so layout is committed
     requestAnimationFrame(scaleIframe);
 
-    // ── TIME HELPERS ──────────────────────────────────────
+    // ── DOWNLOAD DROPDOWN ────────────────────────────────
+    const downloadBtn  = document.getElementById('download-btn');
+    const downloadWrap = document.getElementById('download-wrap');
+    const dropdown     = document.getElementById('dropdown');
+    const toast        = document.getElementById('toast');
+
+    function openDropdown() {
+      dropdown.classList.add('open');
+      downloadBtn.classList.add('open');
+      downloadBtn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeDropdown() {
+      dropdown.classList.remove('open');
+      downloadBtn.classList.remove('open');
+      downloadBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleDropdown() {
+      if (dropdown.classList.contains('open')) {
+        closeDropdown();
+      } else {
+        openDropdown();
+      }
+    }
+
+    downloadBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleDropdown();
+    });
+
+    // Klik di luar dropdown → tutup
+    document.addEventListener('click', (e) => {
+      if (!downloadWrap.contains(e.target)) {
+        closeDropdown();
+      }
+    });
+
+    // Escape → tutup
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDropdown();
+    });
+
+    // ── TOAST FEEDBACK ───────────────────────────────────
+    let toastTimer = null;
+    function showToast(message, durationMs = 2500) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, durationMs);
+    }
+
+    // ── DOWNLOAD HANDLER ─────────────────────────────────
+    // Trigger download dari Drive via `uc?export=download` endpoint.
+    // Kita buat anchor element temporer terus "klik" programmatically — ini
+    // cara paling reliable cross-browser dibanding window.location / window.open.
+    function downloadFromDrive(fileId, filename) {
+      const url = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;  // hint ke browser — Drive response header yang nentuin final filename
+      a.target = '_blank';    // fallback: kalau download nggak auto-trigger, user dibawa ke preview tab
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Attach click handler ke tiap item dropdown
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const fileId   = item.dataset.fileId;
+        const filename = item.dataset.filename;
+        const label    = item.querySelector('.dropdown-item-label').textContent;
+
+        downloadFromDrive(fileId, filename);
+        showToast(`Downloading ${label}…`);
+        closeDropdown();
+      });
+
+      // Keyboard accessibility — Enter / Space buat trigger
+      item.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          item.click();
+        }
+      });
+    });
+
+    // ── TIME HELPERS (unchanged) ─────────────────────────
     function fmt(date) {
       return date.toLocaleTimeString('id-ID', {
         hour: '2-digit', minute: '2-digit', second: '2-digit'
@@ -317,7 +586,7 @@
 
     let nextRefreshTime = getNextRefreshTime();
 
-    // ── REFRESH LOGIC ─────────────────────────────────────
+    // ── REFRESH LOGIC (unchanged) ────────────────────────
     function doRefresh() {
       flashEl.classList.add('show');
 
@@ -342,7 +611,7 @@
       setTimeout(doRefresh, delay);
     }
 
-    // ── COUNTDOWN TICK ────────────────────────────────────
+    // ── COUNTDOWN TICK (unchanged) ───────────────────────
     function tick() {
       const remaining = Math.max(0, nextRefreshTime - Date.now());
       const totalSec  = Math.floor(remaining / 1000);
@@ -354,7 +623,7 @@
       nextEl.textContent = fmt(nextRefreshTime);
     }
 
-    // ── INIT ──────────────────────────────────────────────
+    // ── INIT ─────────────────────────────────────────────
     lastEl.textContent = fmt(new Date());
     scheduleNext();
     setInterval(tick, 1000);
