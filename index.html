@@ -4,13 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Coway Dashboard Monitor</title>
+  <link rel="icon" type="image/png" href="coway-logo.png">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@300;500;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --blue: #1a6fb5;
+      --blue: #2C6FA0;
+      --blue-dark: #1F5580;
+      --accent: #7db8f0;
       --dark: #0d1117;
+      --panel: #111827;
+      --border: #1e2d40;
+      --muted: #4b6484;
+      --header-h: 36px;
       --bar-h: 28px;
     }
 
@@ -27,25 +34,122 @@
       flex-direction: column;
     }
 
-    /* ── TOP BAR ── */
+    /* ═══════════════════════════════════════════════════ */
+    /* ── TIER 1: WHITE BRANDING HEADER ── */
+    /* ═══════════════════════════════════════════════════ */
+    .header {
+      height: var(--header-h);
+      min-height: var(--header-h);
+      flex-shrink: 0;
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo {
+      height: 16px;
+      width: auto;
+      display: block;
+    }
+
+    .brand-title {
+      color: #111827;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: -0.2px;
+      font-family: 'Sora', sans-serif;
+    }
+
+    .brand-badge {
+      padding: 2px 6px;
+      background: #E6F1FB;
+      color: #0C447C;
+      border-radius: 3px;
+      font-size: 8.5px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .version-badge {
+      padding: 2px 7px;
+      background: #f3f4f6;
+      color: #6b7280;
+      border-radius: 4px;
+      font-size: 9.5px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #6b7280;
+      font-size: 11px;
+      text-decoration: none;
+      transition: color 0.15s ease;
+      font-family: 'Sora', sans-serif;
+    }
+    .contact-link:hover {
+      color: var(--blue);
+    }
+    .contact-link svg {
+      width: 11px;
+      height: 11px;
+    }
+
+    .divider-light {
+      width: 1px;
+      height: 14px;
+      background: #e5e7eb;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════ */
+    /* ── TIER 2: DARK MONITOR BAR ── */
+    /* ═══════════════════════════════════════════════════ */
     .topbar {
       height: var(--bar-h);
       min-height: var(--bar-h);
       flex-shrink: 0;
-      background: #111827;
-      border-bottom: 1px solid #1e2d40;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
+      padding: 0 12px;
       gap: 12px;
-      /* changed from hidden → visible so dropdown menu doesn't get clipped */
       overflow: visible;
       position: relative;
       z-index: 20;
     }
 
     .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      min-width: 0;
+    }
+
+    .brand-dark {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -70,17 +174,66 @@
     .label {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
-      color: #4b6484;
+      color: var(--muted);
       letter-spacing: 0.08em;
       text-transform: uppercase;
       white-space: nowrap;
+    }
+
+    /* ── SEGMENTED DASHBOARD SWITCHER (LIGHT VERSION) ── */
+    .switcher {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 5px;
+      padding: 2px;
+      height: 22px;
+    }
+
+    .switcher-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      height: 100%;
+      padding: 0 10px;
+      background: transparent;
+      border: none;
+      border-radius: 3px;
+      color: #6b7280;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .switcher-btn:hover:not(.active) {
+      color: #374151;
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .switcher-btn.active {
+      background: white;
+      color: var(--blue);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .switcher-btn svg {
+      width: 11px;
+      height: 11px;
+      flex-shrink: 0;
     }
 
     .topbar-right {
       display: flex;
       align-items: center;
       gap: 14px;
-      overflow: visible;  /* allow dropdown to show */
+      overflow: visible;
     }
 
     .info-block {
@@ -93,7 +246,7 @@
     .info-label {
       font-family: 'JetBrains Mono', monospace;
       font-size: 9px;
-      color: #4b6484;
+      color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
@@ -101,14 +254,14 @@
     .info-value {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
-      color: #7db8f0;
+      color: var(--accent);
       font-weight: 600;
     }
 
     .countdown {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
-      color: #7db8f0;
+      color: var(--accent);
       font-weight: 600;
       letter-spacing: 0.05em;
     }
@@ -116,21 +269,36 @@
     .divider {
       width: 1px;
       height: 14px;
-      background: #1e2d40;
+      background: var(--border);
       flex-shrink: 0;
     }
 
-    @media (max-width: 600px) {
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hide-md { display: none !important; }
+      .switcher-btn .switcher-label { display: none; }
+      .switcher-btn { padding: 0 8px; }
+      .header { padding: 0 14px; gap: 12px; }
+      .brand-title { display: none; }
+    }
+    @media (max-width: 700px) {
       .hide-sm { display: none !important; }
     }
-    @media (max-width: 400px) {
+    @media (max-width: 500px) {
       .hide-xs { display: none !important; }
+      .label { display: none; }
+      .contact-link span { display: none; }
+      .version-badge { display: none; }
     }
 
     /* ── DOWNLOAD BUTTON + DROPDOWN ── */
     .download-wrap {
       position: relative;
       flex-shrink: 0;
+    }
+
+    .download-wrap.hidden {
+      display: none;
     }
 
     .download-btn {
@@ -140,9 +308,9 @@
       height: 20px;
       padding: 0 10px;
       background: rgba(125, 184, 240, 0.08);
-      border: 1px solid #1e2d40;
+      border: 1px solid var(--border);
       border-radius: 4px;
-      color: #7db8f0;
+      color: var(--accent);
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
       font-weight: 600;
@@ -185,8 +353,8 @@
       top: calc(100% + 6px);
       right: 0;
       min-width: 200px;
-      background: #111827;
-      border: 1px solid #1e2d40;
+      background: var(--panel);
+      border: 1px solid var(--border);
       border-radius: 6px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       opacity: 0;
@@ -207,10 +375,10 @@
       padding: 8px 12px 6px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 8.5px;
-      color: #4b6484;
+      color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      border-bottom: 1px solid #1e2d40;
+      border-bottom: 1px solid var(--border);
     }
 
     .dropdown-item {
@@ -238,7 +406,7 @@
     .dropdown-item svg {
       width: 12px;
       height: 12px;
-      color: #7db8f0;
+      color: var(--accent);
       flex-shrink: 0;
     }
 
@@ -253,7 +421,7 @@
       position: relative;
       overflow: hidden;
       background: var(--dark);
-      height: calc(100dvh - var(--bar-h));
+      height: calc(100dvh - var(--header-h) - var(--bar-h));
     }
 
     iframe {
@@ -299,13 +467,13 @@
       opacity: 1;
     }
 
-    /* ── TOAST (feedback saat download) ── */
+    /* ── TOAST ── */
     .toast {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #111827;
-      border: 1px solid #1e2d40;
+      background: var(--panel);
+      border: 1px solid var(--border);
       border-left: 3px solid #22c55e;
       border-radius: 4px;
       padding: 10px 14px;
@@ -329,26 +497,76 @@
 </head>
 <body>
 
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- TIER 1: WHITE BRANDING HEADER -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <header class="header">
+    <div class="brand">
+      <svg class="brand-logo" viewBox="0 0 200 56" xmlns="http://www.w3.org/2000/svg" aria-label="Coway">
+        <text x="0" y="44" font-family="Sora, -apple-system, sans-serif" font-size="52" font-weight="700" fill="#00ADE4" letter-spacing="-2">coway</text>
+      </svg>
+      <div class="brand-title">CS Management</div>
+      <div class="brand-badge">PORTAL</div>
+    </div>
+
+    <div class="divider-light hide-xs"></div>
+
+    <div class="switcher" role="tablist" aria-label="Select dashboard">
+      <button class="switcher-btn active" data-dashboard="instalasi" role="tab" aria-selected="true" type="button">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="5" height="5"/>
+          <rect x="9" y="2" width="5" height="5"/>
+          <rect x="2" y="9" width="5" height="5"/>
+          <rect x="9" y="9" width="5" height="5"/>
+        </svg>
+        <span class="switcher-label">Instalasi</span>
+      </button>
+      <button class="switcher-btn" data-dashboard="as" role="tab" aria-selected="false" type="button">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9.8 4.2a0.7 0.7 0 0 0 0 1l1.1 1.1a0.7 0.7 0 0 0 1 0l2.5-2.5a4 4 0 0 1-5.3 5.3l-4.6 4.6a1.4 1.4 0 0 1-2-2l4.6-4.6a4 4 0 0 1 5.3-5.3l-2.5 2.5z"/>
+        </svg>
+        <span class="switcher-label">AS/BS/PR/PX</span>
+      </button>
+    </div>
+
+    <div class="header-right">
+      <div class="version-badge" title="Portal version">v1.0</div>
+      <div class="divider-light"></div>
+      <a href="mailto:cs.management@coway.id?subject=Dashboard Portal Issue" class="contact-link" title="Report an issue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        <span>Report issue</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- TIER 2: DARK MONITOR BAR -->
+  <!-- ═══════════════════════════════════════════════════ -->
   <div class="topbar">
     <div class="topbar-left">
-      <div class="dot"></div>
-      <span class="label">Coway Dashboard · Live Monitor</span>
+      <div class="brand-dark">
+        <div class="dot"></div>
+        <span class="label">Live Monitor · <span id="current-dashboard-name">Instalasi</span></span>
+      </div>
     </div>
 
     <div class="topbar-right">
-      <div class="info-block hide-xs">
+      <div class="info-block hide-sm">
         <span class="info-label">Last Refreshed</span>
         <span class="info-value" id="last-refreshed">—</span>
       </div>
 
-      <div class="divider hide-xs"></div>
+      <div class="divider hide-sm"></div>
 
-      <div class="info-block hide-sm">
+      <div class="info-block hide-md">
         <span class="info-label">Next Refresh</span>
         <span class="info-value" id="next-refresh">—</span>
       </div>
 
-      <div class="divider hide-sm"></div>
+      <div class="divider hide-md"></div>
 
       <div class="info-block">
         <span class="info-label">Refresh In</span>
@@ -357,7 +575,6 @@
 
       <div class="divider"></div>
 
-      <!-- ── DOWNLOAD BUTTON ── -->
       <div class="download-wrap" id="download-wrap">
         <button class="download-btn" id="download-btn" type="button" aria-haspopup="true" aria-expanded="false">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -365,7 +582,7 @@
             <path d="M4 7l4 4 4-4"/>
             <path d="M2 13h12"/>
           </svg>
-          <span>Save Image</span>
+          <span class="hide-sm">Save Image</span>
           <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 6l4 4 4-4"/>
           </svg>
@@ -404,9 +621,12 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- IFRAME AREA -->
+  <!-- ═══════════════════════════════════════════════════ -->
   <div class="iframe-wrap" id="iframe-wrap">
     <div class="flash" id="flash">
-      <span class="flash-text">Refreshing data...</span>
+      <span class="flash-text">Loading dashboard...</span>
     </div>
     <iframe
       id="dashboard"
@@ -418,15 +638,25 @@
     ></iframe>
   </div>
 
-  <!-- Toast untuk feedback download -->
   <div class="toast" id="toast">Downloading…</div>
 
   <script>
-    // ── CONFIG ──────────────────────────────────────────
     const DASHBOARD_WIDTH  = 1220;
     const DASHBOARD_HEIGHT = 775;
     const DASHBOARD_RATIO  = DASHBOARD_WIDTH / DASHBOARD_HEIGHT;
-    // ────────────────────────────────────────────────────
+
+    const DASHBOARDS = {
+      instalasi: {
+        name: 'Instalasi',
+        url: 'https://lookerstudio.google.com/embed/reporting/b50b4471-1e49-4ca4-9762-9e9255dcd3e9/page/H8JrF',
+        hasDownloads: true
+      },
+      as: {
+        name: 'AS/BS/PR/PX',
+        url: 'https://lookerstudio.google.com/embed/reporting/578bf145-05f2-41ca-91bc-bfced603aeca/page/p_z333glfq2d',
+        hasDownloads: false
+      }
+    };
 
     const iframe      = document.getElementById('dashboard');
     const flashEl     = document.getElementById('flash');
@@ -434,8 +664,13 @@
     const lastEl      = document.getElementById('last-refreshed');
     const nextEl      = document.getElementById('next-refresh');
     const countdownEl = document.getElementById('countdown');
+    const downloadWrap = document.getElementById('download-wrap');
+    const switcherBtns = document.querySelectorAll('.switcher-btn');
+    const currentDashboardNameEl = document.getElementById('current-dashboard-name');
 
-    // ── DYNAMIC SCALE (unchanged) ────────────────────────
+    let currentDashboard = 'instalasi';
+    let refreshTimer = null;
+
     function scaleIframe() {
       const rect  = wrapEl.getBoundingClientRect();
       const wrapW = rect.width;
@@ -467,13 +702,93 @@
     const ro = new ResizeObserver(() => scaleIframe());
     ro.observe(wrapEl);
     window.addEventListener('resize', scaleIframe);
-    requestAnimationFrame(scaleIframe);
 
-    // ── DOWNLOAD DROPDOWN ────────────────────────────────
-    const downloadBtn  = document.getElementById('download-btn');
-    const downloadWrap = document.getElementById('download-wrap');
-    const dropdown     = document.getElementById('dropdown');
-    const toast        = document.getElementById('toast');
+    iframe.addEventListener('load', () => {
+      setTimeout(() => {
+        flashEl.classList.remove('show');
+        scaleIframe();
+      }, 500);
+    });
+
+    function switchDashboard(key, { updateHash = true, forceReload = false } = {}) {
+      if (!DASHBOARDS[key]) return;
+
+      const isSameDashboard = (key === currentDashboard);
+      const config = DASHBOARDS[key];
+
+      currentDashboard = key;
+
+      switcherBtns.forEach(btn => {
+        const isActive = btn.dataset.dashboard === key;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      // Update the dashboard name shown in the dark monitor bar
+      if (currentDashboardNameEl) {
+        currentDashboardNameEl.textContent = config.name;
+      }
+
+      if (config.hasDownloads) {
+        downloadWrap.classList.remove('hidden');
+      } else {
+        downloadWrap.classList.add('hidden');
+        closeDropdown();
+      }
+
+      if (!isSameDashboard || forceReload) {
+        flashEl.classList.add('show');
+        setTimeout(() => {
+          iframe.src = config.url;
+          lastEl.textContent = fmt(new Date());
+        }, 400);
+
+        nextRefreshTime = getNextRefreshTime();
+        if (refreshTimer) clearTimeout(refreshTimer);
+        scheduleNext();
+      }
+
+      if (updateHash) {
+        const hashMap = { instalasi: 'instalasi', as: 'as-bs-pr-px' };
+        const newHash = hashMap[key] || key;
+        if (window.location.hash.slice(1) !== newHash) {
+          history.replaceState(null, '', '#' + newHash);
+        }
+      }
+
+      document.title = `${config.name} · Coway Live Monitor`;
+    }
+
+    switcherBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchDashboard(btn.dataset.dashboard);
+      });
+    });
+
+    function initDashboardFromHash() {
+      const hash = window.location.hash.slice(1);
+      const hashMap = { 'instalasi': 'instalasi', 'as-bs-pr-px': 'as' };
+      const key = hashMap[hash] || 'instalasi';
+
+      if (key === 'instalasi') {
+        switchDashboard('instalasi', { updateHash: false });
+      } else {
+        switchDashboard(key, { updateHash: false, forceReload: true });
+      }
+    }
+
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.slice(1);
+      const hashMap = { 'instalasi': 'instalasi', 'as-bs-pr-px': 'as' };
+      const key = hashMap[hash] || 'instalasi';
+      if (key !== currentDashboard) {
+        switchDashboard(key, { updateHash: false });
+      }
+    });
+
+    const downloadBtn = document.getElementById('download-btn');
+    const dropdown    = document.getElementById('dropdown');
+    const toast       = document.getElementById('toast');
 
     function openDropdown() {
       dropdown.classList.add('open');
@@ -500,19 +815,16 @@
       toggleDropdown();
     });
 
-    // Klik di luar dropdown → tutup
     document.addEventListener('click', (e) => {
       if (!downloadWrap.contains(e.target)) {
         closeDropdown();
       }
     });
 
-    // Escape → tutup
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeDropdown();
     });
 
-    // ── TOAST FEEDBACK ───────────────────────────────────
     let toastTimer = null;
     function showToast(message, durationMs = 2500) {
       toast.textContent = message;
@@ -523,24 +835,18 @@
       }, durationMs);
     }
 
-    // ── DOWNLOAD HANDLER ─────────────────────────────────
-    // Trigger download dari Drive via `uc?export=download` endpoint.
-    // Kita buat anchor element temporer terus "klik" programmatically — ini
-    // cara paling reliable cross-browser dibanding window.location / window.open.
     function downloadFromDrive(fileId, filename) {
       const url = `https://drive.google.com/uc?export=download&id=${fileId}`;
-
       const a = document.createElement('a');
       a.href = url;
-      a.download = filename;  // hint ke browser — Drive response header yang nentuin final filename
-      a.target = '_blank';    // fallback: kalau download nggak auto-trigger, user dibawa ke preview tab
+      a.download = filename;
+      a.target = '_blank';
       a.rel = 'noopener noreferrer';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
     }
 
-    // Attach click handler ke tiap item dropdown
     document.querySelectorAll('.dropdown-item').forEach(item => {
       item.addEventListener('click', () => {
         const fileId   = item.dataset.fileId;
@@ -552,7 +858,6 @@
         closeDropdown();
       });
 
-      // Keyboard accessibility — Enter / Space buat trigger
       item.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -561,7 +866,6 @@
       });
     });
 
-    // ── TIME HELPERS (unchanged) ─────────────────────────
     function fmt(date) {
       return date.toLocaleTimeString('id-ID', {
         hour: '2-digit', minute: '2-digit', second: '2-digit'
@@ -586,21 +890,13 @@
 
     let nextRefreshTime = getNextRefreshTime();
 
-    // ── REFRESH LOGIC (unchanged) ────────────────────────
     function doRefresh() {
       flashEl.classList.add('show');
 
       setTimeout(() => {
-        iframe.src = iframe.src;
+        iframe.src = DASHBOARDS[currentDashboard].url;
         lastEl.textContent = fmt(new Date());
       }, 900);
-
-      iframe.onload = () => {
-        setTimeout(() => {
-          flashEl.classList.remove('show');
-          scaleIframe();
-        }, 500);
-      };
 
       nextRefreshTime = getNextRefreshTime();
       scheduleNext();
@@ -608,10 +904,10 @@
 
     function scheduleNext() {
       const delay = Math.max(0, nextRefreshTime - Date.now());
-      setTimeout(doRefresh, delay);
+      if (refreshTimer) clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(doRefresh, delay);
     }
 
-    // ── COUNTDOWN TICK (unchanged) ───────────────────────
     function tick() {
       const remaining = Math.max(0, nextRefreshTime - Date.now());
       const totalSec  = Math.floor(remaining / 1000);
@@ -623,11 +919,12 @@
       nextEl.textContent = fmt(nextRefreshTime);
     }
 
-    // ── INIT ─────────────────────────────────────────────
     lastEl.textContent = fmt(new Date());
+    initDashboardFromHash();
     scheduleNext();
     setInterval(tick, 1000);
     tick();
+    requestAnimationFrame(scaleIframe);
   </script>
 </body>
 </html>
